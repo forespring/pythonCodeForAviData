@@ -1,0 +1,76 @@
+__author__ = 'forespring'
+
+###
+#opencvによる動画データへのアクセス方法。
+#手順
+#１、openCVモジュールのcv2.VideoCaptureによって、対象動画のビデオキャプチャ構造体を生成。
+#２、構造体に対して、read()メソッドを使用することで、フレームごとの静止画像ファイルにアクセス。
+#３、例： capをビデオキャプチャ構造体として、frame = cap.read()とすると、frameは、[True, Array]を返す。
+#４、frameのArrayは、画素データ。配列順序としてはArray[heightNumber,widthNumber]
+#５、例：frame[1][0][0] -> 座標(0,0)のピクセルの画素データにアクセス。画素データはbgrで３つ入っている。　
+
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import csv
+
+cap=cv2.VideoCapture('/Users/morizumiryuta/Desktop/ctn_wool.avi')
+
+frameNum    = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
+frameWidth  = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
+frameHeight = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
+rgbNum      = 3
+
+#frameImg = cap.read() #(True,array([[[]]]))
+aviMatrixData = np.empty([frameNum, frameHeight, frameWidth, rgbNum])
+
+counter = 0
+
+while (counter < frameNum):
+    aviMatrixData[counter] = cap.read()[1]
+    counter += 1
+    cap.grab()
+
+###
+#windowに表示
+#
+
+
+
+###
+#PCR解析
+#
+
+#解析し易いようにデータの配列を転置する。これにはtransposeメソッドを用いる。
+#例：行列Aが任意の値で要素数(3,4,5)の３次元配列だとする。
+#これを、(4,5,3)の行列Bに転置させたい場合、B = A.transpose(1,2,0)とすればよい。
+#reshapeメソッドとは異なることに注意。
+#横軸：変数、縦軸：サンプル数
+aviMatrixData = aviMatrixData.transpose(0, 2, 1, 3)
+
+
+#PCR用の２次元データ行列Dtの作成。Dt(frameWidth, frameHeight) = 横：波長、縦：x座標
+Dt = np.empty([frameWidth, frameHeight])
+
+k = 260 # because the k is arbitrary frameNum
+
+for i in range(frameWidth):
+    for j in range(frameHeight):
+        Dt[i][j] = aviMatrixData[k][i][j][0]
+
+
+###
+#グラフ描画
+#
+
+
+#数値データとして
+plt.plot(Dt)
+plt.show()
+
+#画像データとして
+TDt = Dt.transpose()
+
+plt.imshow(TDt, cmap = cm.Greys_r)
+plt.show()
