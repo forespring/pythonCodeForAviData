@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import csv
 
-cap=cv2.VideoCapture('/Users/morizumiryuta/Desktop/ctn_wool.avi')
+cap=cv2.VideoCapture('your file name here')
 
 frameNum    = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
 frameWidth  = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
